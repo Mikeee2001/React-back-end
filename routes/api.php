@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\API\AuthController;
 
 /*
@@ -18,6 +19,7 @@ use App\Http\Controllers\API\AuthController;
 //login and register api
 Route::post("/register", [AuthController::class, "register"]);
 Route::post("/login", [AuthController::class, "login"]);
+
 
 //admin route in the admin it will check the authentication of your and admin
 Route::middleware(['auth:sanctum', 'isAPIAdmin'])->group(function() {
@@ -48,7 +50,14 @@ Route::middleware(['auth:sanctum'])->group(function() {
 });
 
 
+//get the total number of users
+Route::middleware('auth:sanctum')->get('/users', function (Request $request) {
+    $users = \App\Models\User::all(['name', 'email']);
+    return response()->json(['users' => $users]);
+});
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+//Implements the methods for all CRUD operations: index, show, store, update, destroy, and appointDoctor.
+Route::middleware('auth:sanctum')->group(function () {
+    Route::resource('users', UserController::class);
+
 });
