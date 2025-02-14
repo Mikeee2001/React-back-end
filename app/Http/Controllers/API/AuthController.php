@@ -27,6 +27,7 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'role_as' => 0,// Default role for registered users
             ]);
         }
         $token = $user->createToken($user->email . '_Token')->plainTextToken;
@@ -34,7 +35,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => 200,
             'username' => $user->name,
-            'role' => $user->role,
+            'role' => $user->role_as,
             'token' => $token,
             'message' => 'User registered successfully',
         ]);
@@ -45,7 +46,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|max:191',
+            'email' => 'required|max:50',
             'password' => 'required',
 
         ]);
@@ -69,14 +70,19 @@ class AuthController extends Controller
 
              {
 
-                if ($user->role_as == 1) //1 is equal to admin
+                if ($user->role_as == 1) //2 is equal to admin
                 {
                     $role = 'admin';
                     $token = $user->createToken($user->email.'_AdminToken', ['server:admin'])->plainTextToken;
                 }
+                elseif($user->role_as == 2) //1 is for doctor
+                {
+                    $role = 'doctor';
+                    $token = $user->createToken($user->email.'_DoctorToken', ['server:doctor'])->plainTextToken;
+                }
                  else 
                  {
-                    $role = '';
+                    $role = 'user'; //default role for user
                     $token = $user->createToken($user->email . '_Token', [''])->plainTextToken;
                 }
 
@@ -84,7 +90,7 @@ class AuthController extends Controller
                     'status' => 200,
                     'username' => $user->name,
                     'token' => $token,
-                    'message' => 'User Logged in successfully',
+                    'message' => 'Logged in successfully',
                     'role' => $role,
                 ]);
             }
