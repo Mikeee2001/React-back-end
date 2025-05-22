@@ -21,14 +21,14 @@ Route::post("/register", [AuthController::class, "register"]);
 Route::post("/login", [AuthController::class, "login"]);
 
 
-//ADMIN ROUTE 
+//ADMIN ROUTE
 Route::middleware(['auth:sanctum', 'isAPIAdmin'])->group(function() {
 
     Route::get('/checkingAuthenticated', function() {
         return response()->json(['message' => 'You are in', 'status' => 200], 200);
 
     });
- 
+
 });
 
 //DOCTOR ROUTE
@@ -36,7 +36,7 @@ Route::middleware(['auth:sanctum', 'isAPIDoctor'])->group(function() {
     Route::get('/checkingAuthenticatedDoctor', function() {
         $user = auth()->user();
 
-        if ($user->role_as == 2) { // CHECK ROLE IF 2 AS DOCTOR AND IT WILL GOTO DOCTOR DASHBOARD
+        if ($user->role_as == 'doctor') { // CHECK ROLE IF DOCTOR AND IT WILL GOTO DOCTOR DASHBOARD
             return response()->json(['message' => 'Welcome Doctor', 'status' => 200], 200);
         } else {
             return response()->json(['message' => 'Access Denied! You are not a Doctor.', 'status' => 403], 403);
@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum', 'isAPIDoctor'])->group(function() {
 
 //logout button
 Route::middleware(['auth:sanctum'])->group(function() {
-    
+
 
     Route::post('/logout', [AuthController::class, "logout"]);
 });

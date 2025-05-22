@@ -11,7 +11,7 @@ class UserController extends Controller
     // Get all users
     public function index()
     {
-        $users = User::all(['id', 'name', 'email']);
+        $users = User::all(['id', 'name', 'email', 'role_as']);
         return response()->json(['users' => $users]);
     }
 
@@ -27,26 +27,25 @@ class UserController extends Controller
 
     // Create a new user
     public function store(Request $request)
-    {
-       
-        {
+    { {
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
-                'auth_role' => 'required|string|max:255'
+                'role_as' => 'required|string|in:admin,doctor,user', // Expect a string, not a number
             ]);
-    
+
+
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password), // Hash the password
-                'auth_role' => $request->auth_role
+                'role_as' => $request->role_as
             ]);
-    
+
             return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
         }
-
 
     }
 
